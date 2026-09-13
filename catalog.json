@@ -1,0 +1,57 @@
+[
+  {
+    "name": "Mutual Non-Disclosure Agreement",
+    "description": "Common Paper standard Mutual Non-Disclosure Agreement (MNDA) for protecting confidential information shared between two parties.",
+    "filename": "Mutual-NDA.md"
+  },
+  {
+    "name": "Cloud Service Agreement",
+    "description": "Common Paper standard Cloud Service Agreement for selling and buying cloud software and SaaS products.",
+    "filename": "CSA.md"
+  },
+  {
+    "name": "Design Partner Agreement",
+    "description": "Common Paper standard Design Partner Agreement for giving early customers access to a product in exchange for feedback.",
+    "filename": "Design-Partner-Agreement.md"
+  },
+  {
+    "name": "Service Level Agreement",
+    "description": "Common Paper Service Level Agreement, designed to be used alongside the Cloud Service Agreement to set uptime and support response targets.",
+    "filename": "SLA.md"
+  },
+  {
+    "name": "Professional Services Agreement",
+    "description": "Common Paper standard Professional Services Agreement for engaging a provider to perform services described in a Statement of Work.",
+    "filename": "PSA.md"
+  },
+  {
+    "name": "Data Processing Agreement",
+    "description": "Common Paper Data Processing Agreement governing the processing of personal data between a controller/processor and a processor/subprocessor.",
+    "filename": "DPA.md"
+  },
+  {
+    "name": "Software License Agreement",
+    "description": "Common Paper standard Software License Agreement for licensing on-premises or client-side software.",
+    "filename": "Software-License-Agreement.md"
+  },
+  {
+    "name": "Partnership Agreement",
+    "description": "Common Paper standard Partnership Agreement for business partnerships involving cooperation and trademark licensing between two companies.",
+    "filename": "Partnership-Agreement.md"
+  },
+  {
+    "name": "Business Associate Agreement",
+    "description": "Common Paper standard Business Associate Agreement (BAA) for HIPAA-covered entities and their business associates handling protected health information.",
+    "filename": "BAA.md"
+  },
+  {
+    "name": "Pilot Agreement",
+    "description": "Common Paper standard Pilot Agreement for a short-term trial or evaluation of a product or service before a longer-term commercial agreement.",
+    "filename": "Pilot-Agreement.md"
+  },
+  {
+    "name": "AI Addendum",
+    "description": "Common Paper standard AI Addendum supplementing a core agreement with terms governing the use of AI services, including model training and output ownership.",
+    "filename": "AI-Addendum.md"
+  }
+]
