@@ -6,19 +6,19 @@ type PartyFieldKey = keyof PartyDetails;
 type TopLevelFieldKey = Exclude<keyof NdaFormData, "partyA" | "partyB">;
 
 const partyFields: { key: PartyFieldKey; label: string; type: "text" | "textarea" }[] = [
-  { key: "legalName", label: "Legal Name", type: "text" },
+  { key: "legalName", label: "Legal name", type: "text" },
   { key: "address", label: "Address", type: "textarea" },
-  { key: "signatoryName", label: "Signatory Name", type: "text" },
-  { key: "signatoryTitle", label: "Signatory Title", type: "text" },
-  { key: "signatoryEmail", label: "Signatory Email", type: "text" },
+  { key: "signatoryName", label: "Signatory name", type: "text" },
+  { key: "signatoryTitle", label: "Signatory title", type: "text" },
+  { key: "signatoryEmail", label: "Signatory email", type: "text" },
 ];
 
 const termFields: { key: TopLevelFieldKey; label: string; type: "text" | "textarea" | "date" }[] = [
-  { key: "effectiveDate", label: "Effective Date", type: "date" },
-  { key: "purpose", label: "Purpose", type: "textarea" },
-  { key: "mndaTerm", label: "MNDA Term", type: "text" },
-  { key: "confidentialityTerm", label: "Term of Confidentiality", type: "text" },
-  { key: "governingLaw", label: "Governing Law", type: "text" },
+  { key: "effectiveDate", label: "Effective date", type: "date" },
+  { key: "purpose", label: "Purpose of disclosure", type: "textarea" },
+  { key: "mndaTerm", label: "MNDA term", type: "text" },
+  { key: "confidentialityTerm", label: "Term of confidentiality", type: "text" },
+  { key: "governingLaw", label: "Governing law", type: "text" },
   { key: "jurisdiction", label: "Jurisdiction", type: "text" },
 ];
 
@@ -35,16 +35,18 @@ function Field({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const controlClass =
+    "rounded-md border border-line bg-white px-3 py-2 text-[14px] text-ink shadow-sm outline-none transition-colors focus:border-seal focus:ring-2 focus:ring-focus-ring/40";
   return (
-    <label htmlFor={id} className="flex flex-col gap-1 text-sm">
-      <span className="font-medium text-zinc-700 dark:text-zinc-300">{label}</span>
+    <label htmlFor={id} className="flex flex-col gap-1.5 text-sm">
+      <span className="font-medium text-ink-soft">{label}</span>
       {type === "textarea" ? (
         <textarea
           id={id}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           rows={2}
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-zinc-900 shadow-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+          className={controlClass}
         />
       ) : (
         <input
@@ -52,7 +54,7 @@ function Field({
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-zinc-900 shadow-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+          className={controlClass}
         />
       )}
     </label>
@@ -60,21 +62,28 @@ function Field({
 }
 
 function PartyFieldset({
+  badge,
   label,
   party,
   onChange,
 }: {
+  badge: string;
   label: string;
   party: PartyDetails;
   onChange: (party: PartyDetails) => void;
 }) {
   return (
-    <fieldset className="flex flex-col gap-3 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
-      <legend className="px-1 font-semibold text-zinc-900 dark:text-zinc-100">{label}</legend>
+    <fieldset className="flex flex-col gap-4">
+      <legend className="mb-1 flex items-center gap-2">
+        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-seal-tint text-[11px] font-semibold text-seal-dark">
+          {badge}
+        </span>
+        <span className="font-medium text-ink">{label}</span>
+      </legend>
       {partyFields.map(({ key, label: fieldLabel, type }) => (
         <Field
           key={key}
-          id={`${label}-${key}`}
+          id={`${label.toLowerCase().replace(/\s+/g, "-")}-${key}`}
           label={fieldLabel}
           type={type}
           value={party[key]}
@@ -93,23 +102,24 @@ export function NdaForm({
   onChange: (value: NdaFormData) => void;
 }) {
   return (
-    <form className="flex flex-col gap-6" onSubmit={(e) => e.preventDefault()}>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <form className="flex flex-col gap-8" onSubmit={(e) => e.preventDefault()}>
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <PartyFieldset
+          badge="A"
           label="Party A"
           party={value.partyA}
           onChange={(partyA) => onChange({ ...value, partyA })}
         />
         <PartyFieldset
+          badge="B"
           label="Party B"
           party={value.partyB}
           onChange={(partyB) => onChange({ ...value, partyB })}
         />
       </div>
-      <fieldset className="flex flex-col gap-3 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
-        <legend className="px-1 font-semibold text-zinc-900 dark:text-zinc-100">
-          Agreement Terms
-        </legend>
+      <div className="h-px bg-line" />
+      <fieldset className="flex flex-col gap-4">
+        <legend className="mb-1 font-medium text-ink">Agreement terms</legend>
         {termFields.map(({ key, label, type }) => (
           <Field
             key={key}

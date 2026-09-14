@@ -36,16 +36,67 @@ export const emptyNdaFormData: NdaFormData = {
   jurisdiction: "",
 };
 
+// Counts how many of the form's fields have a non-empty value, so the UI
+// can show the user how far along they are in completing the cover page.
+export function countCompletedFields(data: NdaFormData): { completed: number; total: number } {
+  const partyFieldCount = Object.keys(emptyParty).length;
+  const termFieldCount = Object.keys(emptyNdaFormData).length - 2; // minus partyA/partyB
+  const total = partyFieldCount * 2 + termFieldCount;
+
+  const countParty = (party: PartyDetails) =>
+    Object.values(party).filter((v) => v.trim() !== "").length;
+
+  const { partyA, partyB, ...terms } = data;
+  const completed =
+    countParty(partyA) +
+    countParty(partyB) +
+    Object.values(terms).filter((v) => v.trim() !== "").length;
+
+  return { completed, total };
+}
+
+// Escapes CommonMark-significant punctuation in free-form user input before
+// it's interpolated into the generated markdown. Without this, a party
+// whose address is literally "---" would have it rendered as a horizontal
+// rule instead of an address, and "**bold**" typed into any field would
+// break out of the bold wrapper it's embedded in and corrupt the rest of
+// the document's formatting. The on-screen preview (react-markdown) already
+// understands backslash-escapes per the CommonMark spec; lib/pdf.ts's own
+// lightweight parser is taught to recognize and reverse them too (see
+// stripInlineMarkdown/classifyBlock).
+//
+// Two passes, deliberately not one flat character class:
+//  - `*_[]()~ and backslash itself are escaped everywhere, since they can
+//    trigger inline formatting (bold, emphasis, links, strikethrough)
+//    wherever they appear in a line.
+//  - `#>+-` are only escaped when they *lead* a line, since that's the only
+//    position where they mean anything (heading, blockquote, list marker,
+//    or — for a repeated run of "-" — a thematic break). A hyphen in the
+//    middle of a date like "2026-10-01" is never reinterpreted, so leaving
+//    it alone keeps the common case free of unnecessary backslashes.
+function escapeMarkdown(value: string): string {
+  return value
+    .replace(/[\\`*_[\]()~]/g, "\\$&")
+    .replace(/^([ \t]*)([#>+-])/gm, "$1\\$2");
+}
+
+function withPlaceholder(value: string, placeholder: string): string {
+  return value ? escapeMarkdown(value) : placeholder;
+}
+
 // Maps the field names that appear in the Common Paper coverpage_link spans
 // (templates/Mutual-NDA.md) to the value the user entered for that field.
 function coverPageValues(data: NdaFormData): Record<string, string> {
   return {
-    Purpose: data.purpose || "[Purpose]",
-    "Effective Date": data.effectiveDate || "[Effective Date]",
-    "MNDA Term": data.mndaTerm || "[MNDA Term]",
-    "Term of Confidentiality": data.confidentialityTerm || "[Term of Confidentiality]",
-    "Governing Law": data.governingLaw || "[Governing Law]",
-    Jurisdiction: data.jurisdiction || "[Jurisdiction]",
+    Purpose: withPlaceholder(data.purpose, "[Purpose]"),
+    "Effective Date": withPlaceholder(data.effectiveDate, "[Effective Date]"),
+    "MNDA Term": withPlaceholder(data.mndaTerm, "[MNDA Term]"),
+    "Term of Confidentiality": withPlaceholder(
+      data.confidentialityTerm,
+      "[Term of Confidentiality]"
+    ),
+    "Governing Law": withPlaceholder(data.governingLaw, "[Governing Law]"),
+    Jurisdiction: withPlaceholder(data.jurisdiction, "[Jurisdiction]"),
   };
 }
 
@@ -65,11 +116,11 @@ export function fillStandardTerms(templateMarkdown: string, data: NdaFormData): 
 }
 
 function partySection(party: PartyDetails, label: string): string {
-  const name = party.legalName || `[${label} Legal Name]`;
-  const address = party.address || `[${label} Address]`;
-  const signatory = party.signatoryName || `[${label} Signatory Name]`;
-  const title = party.signatoryTitle || `[${label} Signatory Title]`;
-  const email = party.signatoryEmail || `[${label} Signatory Email]`;
+  const name = withPlaceholder(party.legalName, `[${label} Legal Name]`);
+  const address = withPlaceholder(party.address, `[${label} Address]`);
+  const signatory = withPlaceholder(party.signatoryName, `[${label} Signatory Name]`);
+  const title = withPlaceholder(party.signatoryTitle, `[${label} Signatory Title]`);
+  const email = withPlaceholder(party.signatoryEmail, `[${label} Signatory Email]`);
   return `**${label}: ${name}**
 
 ${address}

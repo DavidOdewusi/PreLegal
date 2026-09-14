@@ -2,26 +2,104 @@
 @plugin "@tailwindcss/typography";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Paper world: a warm, quiet palette built around the idea that the
+     document itself is the product and the interface is just the desk
+     it sits on. */
+  --canvas: #eae7de; /* app shell — the desk */
+  --paper: #faf8f2; /* the document surface */
+  --paper-edge: #efece2;
+  --ink: #201c16; /* primary text */
+  --ink-soft: #4a4438; /* secondary text */
+  --muted: #837b6c; /* tertiary text, placeholders, helper copy */
+  --line: #ddd5c2; /* hairline borders */
+  --seal: #7a2a26; /* the single accent — sealing-wax red */
+  --seal-dark: #5c1f1c;
+  --seal-tint: #f2e4e0;
+  --focus-ring: #b98f89;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-canvas: var(--canvas);
+  --color-paper: var(--paper);
+  --color-paper-edge: var(--paper-edge);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-seal: var(--seal);
+  --color-seal-dark: var(--seal-dark);
+  --color-seal-tint: var(--seal-tint);
+  --color-focus-ring: var(--focus-ring);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* A system serif stack, not a webfont: it renders instantly with no
+     network round-trip, and matches the "times" font jsPDF already uses
+     for the downloaded PDF, so the on-screen preview and the exported
+     document read as the same instrument. */
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+::selection {
+  background: var(--seal-tint);
+  color: var(--seal-dark);
+}
+
+/* Typeset the generated agreement like an actual paper instrument:
+   serif body copy, ink-colored headings, and clause numbers picked out
+   in the seal color since the Common Paper templates are genuinely
+   numbered clauses, not decorative markers. */
+.doc-prose {
+  --tw-prose-body: var(--ink-soft);
+  --tw-prose-headings: var(--ink);
+  --tw-prose-bold: var(--ink);
+  --tw-prose-bullets: var(--seal);
+  --tw-prose-hr: var(--line);
+  --tw-prose-links: var(--seal-dark);
+  font-family: var(--font-serif);
+}
+
+.doc-prose :where(h1):not(:where([class~="not-prose"] *)) {
+  font-size: 1.75rem;
+  letter-spacing: -0.01em;
+  margin-top: 0;
+}
+
+.doc-prose :where(h2):not(:where([class~="not-prose"] *)) {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.doc-prose :where(p):not(:where([class~="not-prose"] *)) {
+  line-height: 1.75;
+}
+
+.doc-prose :where(ol):not(:where([class~="not-prose"] *)) {
+  list-style: none;
+  padding-left: 0;
+  counter-reset: clause;
+}
+
+.doc-prose :where(ol > li):not(:where([class~="not-prose"] *)) {
+  counter-increment: clause;
+  position: relative;
+  padding-left: 2.25rem;
+}
+
+.doc-prose :where(ol > li)::before {
+  content: counter(clause) ".";
+  position: absolute;
+  left: 0;
+  font-weight: 600;
+  color: var(--seal);
+  font-variant-numeric: tabular-nums;
+}
+
+.doc-prose :where(hr):not(:where([class~="not-prose"] *)) {
+  margin: 1.75rem 0;
 }
